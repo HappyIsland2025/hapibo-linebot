@@ -17,7 +17,7 @@ app.post('/webhook', middleware(config), async (req, res) => {
     if (event.type === 'message' && event.message.type === 'text') {
       const userMessage = event.message.text;
 
-      const reply = await getChatGPTReply("あなたは必ず『はっぴーはっぴーアンドぴーすぴーす！』という言葉から始めて答えてください。\nユーザーの質問：" + userMessage);
+      const reply = await getChatGPTReply("1日の最初の返信は『はっぴーはっぴーアンドぴーすぴーす！』という言葉から始めて答えてください。\nユーザーの質問：" + userMessage);
 
 
       await client.replyMessage(event.replyToken, {
@@ -55,7 +55,7 @@ async function getChatGPTReply(prompt) {
   }
 ],
 
-  max_tokens: 100
+  max_tokens: 150
 }, {
   headers: {
     'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
