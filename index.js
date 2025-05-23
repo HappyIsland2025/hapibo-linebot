@@ -122,10 +122,6 @@ app.listen(PORT, () => {
 });
 
 
-
-
-});
-
 async function getChatGPTReply(systemPrompt, userMessage) {
   try {
     const basePrompt = `あなたは「真祖はぴぼ」と呼ばれる30歳の男性です。
@@ -170,6 +166,7 @@ YouTubeチャンネル（https://www.youtube.com/@はぴぼ教はっぴーアイ
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
+    });    
         
     return response.data.choices[0].message.content.trim();
   } catch (err) {
@@ -193,6 +190,7 @@ async function getXAIReply(userMessage) {
         'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
+    });    
     return response.data.choices[0].message.content.trim();
   } catch (err) {
     console.error('XAI Error:', err.response?.data || err.message);
