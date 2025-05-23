@@ -214,14 +214,12 @@ YouTubeチャンネル（https://www.youtube.com/@はぴぼ教はっぴーアイ
         { role: 'user', content: userMessage }
       ],
       max_tokens: 200      
-      stream: false,
-      temperature: 0
     }, {
       headers: {
         'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
-    });    
+    }); 
     return response.data.choices[0].message.content.trim();
   } catch (err) {
     console.error('XAI Error:', err.response?.data || err.message);
