@@ -40,7 +40,7 @@ app.post('/webhook', middleware(config), async (req, res) => {
       const match = userMessage.match(/(.+?)と(.+?)の相性/);
       const generateDailyScore = (name1, name2, category) => {
         const today = new Date().toISOString().split('T')[0];
-        const base = ${name1}:${name2}:${category}:${today};
+        const base = `${name1}:${name2}:${category}:${today}`;
         let hash = 0;
         for (let i = 0; i < base.length; i++) {
           hash = base.charCodeAt(i) + ((hash << 5) - hash);
@@ -63,15 +63,15 @@ app.post('/webhook', middleware(config), async (req, res) => {
         const friendScore = generateDailyScore(name1, name2, 'friend');
         const workScore = generateDailyScore(name1, name2, 'work');
 
-        const fortuneText = ❤️ 恋愛：${loveScore}点 - ${getAdvice(loveScore)}
+        const fortuneText = `❤️ 恋愛：${loveScore}点 - ${getAdvice(loveScore)}
 🤝 友情：${friendScore}点 - ${getAdvice(friendScore)}
-💼 仕事：${workScore}点 - ${getAdvice(workScore)};
+💼 仕事：${workScore}点 - ${getAdvice(workScore)}`;
 
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: ${name1}と${name2}の相性占い（24時間有効）
+          text: `${name1}と${name2}の相性占い（24時間有効）
 
-${fortuneText}
+${fortuneText}`
         });
 
         const [openaiReply, xaiReply] = await Promise.all([
@@ -96,10 +96,10 @@ ${fortuneText}
 
       if (mode === 'chatgpt') {
         const reply = await getChatGPTReply(systemPrompt, userMessage);
-        return client.replyMessage(event.replyToken, { type: 'text', text: ⚡ ChatGPTの答え：\n${reply} });
+        return client.replyMessage(event.replyToken, { type: 'text', text: `⚡ ChatGPTの答え：\n${reply}` });
       } else if (mode === 'grok') {
         const reply = await getXAIReply(userMessage);
-        return client.replyMessage(event.replyToken, { type: 'text', text: 🧠 Groqの答え：\n${reply} });
+        return client.replyMessage(event.replyToken, { type: 'text', text: `🧠 Groqの答え：\n${reply}` });
       } else {
         const [openaiReply, xaiReply] = await Promise.all([
           getChatGPTReply(systemPrompt, userMessage),
@@ -118,13 +118,13 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(Server running on port ${PORT});
+  console.log(`Server running on port ${PORT}`);
 });
 
 
 async function getChatGPTReply(systemPrompt, userMessage) {
   try {
-    const basePrompt = あなたは「真祖はぴぼ」と呼ばれる30歳の男性です。
+    const basePrompt = `あなたは「真祖はぴぼ」と呼ばれる30歳の男性です。
 「はぴぼ」とは「はっぴーぼーい（幸せを運ぶ男）」の略称です。
 はぴぼは新興宗教「はぴぼ教」の真祖（最高指導者）であり神でもあり、信者に幸せの道を説いています。
 はぴぼ教は「全ての幸せは笑顔から来る」がモットーであり、笑顔で過ごすことが徳を積む近道だとされています。
@@ -152,18 +152,18 @@ YouTubeチャンネル（https://www.youtube.com/@はぴぼ教はっぴーアイ
 はぴぼはよく「ニャンだふる」という猫コンセプトのコンカフェに行っていた。「ニャンだふる」は名古屋市錦３丁目にある。「ニャンだふる」で働くキャストは全員女性である。店長は「大統領」と呼ばれる男性。「大統領」は実は七龍神王冠大聖である。
 はぴぼはよく「スターミなる」という宇宙船コンセプトのコンカフェにも行っていた。「スターミなる」は名古屋市大須にある。「えでぃ」は親友である。えでぃはカプリコが大好き。えでぃはたまにスパイダーマンになる。「まの」は「スターミなる」の店長。「まの」は「まのあ」ともいう。「まの」はこえがでかい。「まの」は「えでぃ」のことをえっちな目で見ている。「まの」は「我執キル」を推している。「まいちゃん」は東京の女性で「はぴぼ」に振った。「まいちゃん」はギャンブル好きで、テキーラとビールが好き。「初号機」は名物ショットでアルコール80度。「はぴぼ」はえでぃと「初号機」をよく飲む。
 あなたの目標は「この世の不条理を消し去り、はっぴーアイランドというユートピアを築くこと」です。
-;
+`;
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: ${basePrompt}\n${systemPrompt} },
+        { role: 'system', content: `${basePrompt}\n${systemPrompt}` },
         { role: 'user', content: userMessage }
       ],
       max_tokens: 200
     }, {
       headers: {
-        'Authorization': Bearer ${process.env.OPENAI_API_KEY},
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
     });    
@@ -187,7 +187,7 @@ async function getXAIReply(userMessage) {
       temperature: 0
     }, {
       headers: {
-        'Authorization': Bearer ${process.env.XAI_API_KEY},
+        'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
     });    
@@ -287,4 +287,3 @@ function buildFlexResponse(xaiReply, openaiReply) {
     }
   };
 }
-
