@@ -14,11 +14,6 @@ const app = express();
 // 簡易セッション管理（インメモリ）
 const userModes = {}; // userId: 'chatgpt' | 'grok' | 'both'
 
-const richMenuMap = {
-  chatgpt: 'RICH_MENU_ID_CHATGPT',
-  grok: 'RICH_MENU_ID_GROK',
-  both: 'RICH_MENU_ID_BOTH',
-};
 
 app.post('/webhook', middleware(config), async (req, res) => {
   const events = req.body.events;
@@ -30,16 +25,13 @@ app.post('/webhook', middleware(config), async (req, res) => {
       // モード切替処理
       if (userMessage.includes('右脳モード')) {
         userModes[userId] = 'grok';
-        await client.linkRichMenuToUser(userId, richMenuMap['grok']);
-        return client.replyMessage(event.replyToken, { type: 'text', text: '🧠 Groq（右脳）モードに切り替えました。' });
+                return client.replyMessage(event.replyToken, { type: 'text', text: '🧠 Groq（右脳）モードに切り替えました。' });
       } else if (userMessage.includes('左脳モード')) {
         userModes[userId] = 'chatgpt';
-        await client.linkRichMenuToUser(userId, richMenuMap['chatgpt']);
-        return client.replyMessage(event.replyToken, { type: 'text', text: '⚡ ChatGPT（左脳）モードに切り替えました。' });
+                return client.replyMessage(event.replyToken, { type: 'text', text: '⚡ ChatGPT（左脳）モードに切り替えました。' });
       } else if (userMessage.includes('2択モード')) {
         userModes[userId] = 'both';
-        await client.linkRichMenuToUser(userId, richMenuMap['both']);
-        return client.replyMessage(event.replyToken, { type: 'text', text: '🔀 2択比較モードに切り替えました。' });
+                return client.replyMessage(event.replyToken, { type: 'text', text: '🔀 2択比較モードに切り替えました。' });
       }
 
       const mode = userModes[userId] || 'both';
@@ -178,7 +170,7 @@ YouTubeチャンネル（https://www.youtube.com/@はぴぼ教はっぴーアイ
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
-    });
+        
     return response.data.choices[0].message.content.trim();
   } catch (err) {
     console.error('OpenAI Error:', err.response?.data || err.message);
@@ -201,7 +193,6 @@ async function getXAIReply(userMessage) {
         'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
-    });
     return response.data.choices[0].message.content.trim();
   } catch (err) {
     console.error('XAI Error:', err.response?.data || err.message);
