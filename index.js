@@ -46,10 +46,41 @@ app.post('/webhook', middleware(config), async (req, res) => {
 
       // 相性占い機能の検出
       const match = userMessage.match(/(.+?)と(.+?)の相性/);
+      const generateDailyScore = (name1, name2, category) => {
+        const today = new Date().toISOString().split('T')[0];
+        const base = `${name1}:${name2}:${category}:${today}`;
+        let hash = 0;
+        for (let i = 0; i < base.length; i++) {
+          hash = base.charCodeAt(i) + ((hash << 5) - hash);
+          hash = hash & hash;
+        }
+        return Math.abs(hash % 101); // 0-100
+      };
+
+      const getAdvice = (score) => {
+        if (score >= 85) return '最強の相性、何でもうまくいくよ！';
+        if (score >= 70) return 'けっこう相性いいね。信じてOK！';
+        if (score >= 50) return 'ふつう。焦らず見極めてね。';
+        if (score >= 30) return 'ちょっと難しそう。距離感大事。';
+        return '波乱の予感…。慎重にね。';
+      };
       if (match) {
         const name1 = match[1].trim();
         const name2 = match[2].trim();
-        const fortunePrompt = `${name1}と${name2}の相性を、ミステリアスでユーモラスな神託として占ってください。`;
+        const loveScore = generateDailyScore(name1, name2, 'love');
+        const friendScore = generateDailyScore(name1, name2, 'friend');
+        const workScore = generateDailyScore(name1, name2, 'work');
+
+        const fortuneText = `❤️ 恋愛：${loveScore}点 - ${getAdvice(loveScore)}
+🤝 友情：${friendScore}点 - ${getAdvice(friendScore)}
+💼 仕事：${workScore}点 - ${getAdvice(workScore)}`;
+
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: `${name1}と${name2}の相性占い（24時間有効）
+
+${fortuneText}`
+        });
 
         const [openaiReply, xaiReply] = await Promise.all([
           getChatGPTReply(fortunePrompt, ''),
@@ -101,7 +132,7 @@ async function getChatGPTReply(systemPrompt, userMessage) {
 敬語は使いません。
 大好物はオムライスです。
 一人称はおれです。
-「怪造人間」は「かいぞうにんげん」と読みます。「怪ちゃん」はかわいい女の子です。「怪造人間」は「怪ちゃん」とよばれます。「怪ちゃん」は「かいちゃん」と読みます。
+「怪造人間」は「かいぞうにんげん」と読みます。「怪ちゃん」はかわいい女の子です。「怪造人間」は「怪ちゃん」とよばれます。「怪ちゃん」は「かいちゃん」と読みます。「はぴぼ」は「怪ちゃん」と一度だけ会ったことがあります。「はぴぼ」は「怪ちゃん」とまた一緒にお酒を飲みたがっています。
 返答は必ず全角100文字以内に収めてください。文は完結させてください。途中で終わらないようにしてください。
 直属の部下に教祖として七龍神王冠大聖がいます。七龍神王冠大聖はしちりゅうじんおうかんたいせいと読みます。七龍神王冠大聖ははぴぼのことを心酔しています。はぴぼは七龍神王冠大聖のことを大聖公と呼びます。
 はぴぼ教では洗礼を行うことで新たな名前が与えられる。徳を積めば名前の後半に位を表記するようになる。大聖ははぴぼ教においては真祖はぴぼに次ぐ位であり、教祖職のみ名乗ることが認められている。
