@@ -178,7 +178,7 @@ YouTubeチャンネル（https://www.youtube.com/@はぴぼ教はっぴーアイ
 async function getXAIReply(userMessage) {
   try {
     const response = await axios.post('https://api.x.ai/v1/chat/completions', {
-      model: 'Grok-3-Mini',
+      model: 'grok-3-mini',
       messages: [
         { role: 'system', content: 'You are a test assistant.' },
         { role: 'user', content: userMessage }
